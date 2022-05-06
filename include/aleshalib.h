@@ -233,10 +233,10 @@ aputs (String s) {
             apush_magnet ();
             apull_magnet ();
          }
-         for (int i = 0; i < 25; ++i)
+         for (int i = 0; i < 35; ++i)
             amoveL();
       }
-      for (int i = 0; i < s.length() * 50; ++i) {
+      for (int i = 0; i < s.length() * 60; ++i) {
          amoveR();
       }
       for (int i = 0; i < 20; ++i) {

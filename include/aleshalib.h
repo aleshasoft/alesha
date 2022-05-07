@@ -25,7 +25,7 @@ void astepZ       (void);
 void amoveU       (void);
 void amoveD       (void);
 void astepX       (void);
-char acnv         (char);
+char acnv         (int);
 void aputc        (char);
 void aputs        (String);
 
@@ -94,9 +94,49 @@ astepX (void) {
    delay (DELAY_BETWEEN_STEPS_X);
 }
 
+bool odd = 1;
+
 char
-acnv (char c) {
+acnv (int c) {
    switch (c) {
+   case ',':
+      return 0b010000;
+   
+   case ';':
+      return 0b110000;
+   
+   case ':':
+      return 0b010010;
+
+   case '.':
+      return 0b010110;
+   
+   case '!':
+      return 0b110010;
+
+   case '(':
+   case ')':
+      return 0b110110;
+   
+   case '?':
+      return 0b110100;
+
+   case '\"':
+      odd ^= 1;
+      if (odd)
+         return 0b100110;
+      else
+         return 0b110100;
+
+   case '\'':
+      return 0b100000;
+   
+   case '*':
+      return 0b100010;
+
+   case '_':
+      return 0b100100;
+
    case 'a':
       return 0b001000;
 
@@ -215,14 +255,29 @@ aputc (char c) {
 void
 aputs (String s) {
    char ar[3][33];
+   int offset = 0;
    for (int i = 0;  i < s.length(); ++i) {
+      if (s[i] >= 'A' && s[i] <= 'Z') {
+         ar[0][i + offset] = 0;
+         ar[1][i + offset] = 0;
+         ar[2][i + offset] = 1;
+         s[i] += 'a' - 'A';
+         offset++;
+      }
+      if (s[i] >= '0' && s[i] <= 9) {
+         ar[0][i + offset] = 1;
+         ar[1][i + offset] = 1;
+         ar[2][i + offset] = 3;
+         s[i] += 'a' - '0';
+         offset++;
+      }
       char x = acnv(s[i]);
-      ar[0][i] = (x & 1)       | ((x & 8) / 4);
-      ar[1][i] = ((x & 2) / 2) | ((x & 16) / 8);
-      ar[2][i] = ((x & 4) / 4) | ((x & 32) / 16);
+      ar[0][i + offset] = (x & 1)       | ((x & 8) / 4);
+      ar[1][i + offset] = ((x & 2) / 2) | ((x & 16) / 8);
+      ar[2][i + offset] = ((x & 4) / 4) | ((x & 32) / 16);
    }
    for (int line = 0; line < 3; ++line) {
-      for (int i = 0; i < s.length(); ++i) {
+      for (int i = 0; i < s.length() + offset; ++i) {
          if (ar[line][i] & 2) {
             apush_magnet ();
             apull_magnet ();
@@ -236,7 +291,7 @@ aputs (String s) {
          for (int i = 0; i < 35; ++i)
             amoveL();
       }
-      for (int i = 0; i < s.length() * 60; ++i) {
+      for (int i = 0; i < (s.length() + offset) * 60; ++i) {
          amoveR();
       }
       for (int i = 0; i < 20; ++i) {

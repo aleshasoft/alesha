@@ -12,9 +12,9 @@
 #define X_DIRECTION_PIN       5
 #define MAGIC                 8
 
-#define DELAY_PUSH_PULL       15
-#define DELAY_BETWEEN_STEPS_Z 15
-#define DELAY_BETWEEN_STEPS_X 15
+#define DELAY_PUSH_PULL       12
+#define DELAY_BETWEEN_STEPS_Z 500
+#define DELAY_BETWEEN_STEPS_X 500
 
 void alesha_init  (void);
 void apush_magnet (void);
@@ -71,8 +71,9 @@ amoveR (void) {
 void
 astepZ (void) {
    digitalWrite (Z_STEP_PIN, HIGH);
+   // delayMicroseconds (DELAY_BETWEEN_STEPS_Z);
    digitalWrite (Z_STEP_PIN, LOW);
-   delay (DELAY_BETWEEN_STEPS_Z);
+   delayMicroseconds (DELAY_BETWEEN_STEPS_Z);
 }
 
 void
@@ -90,8 +91,9 @@ amoveU (void) {
 void
 astepX (void) {
    digitalWrite (X_STEP_PIN, HIGH);
+   // delayMicroseconds (DELAY_BETWEEN_STEPS_X);
    digitalWrite (X_STEP_PIN, LOW);
-   delay (DELAY_BETWEEN_STEPS_X);
+   delayMicroseconds (DELAY_BETWEEN_STEPS_X);
 }
 
 bool odd = 1;

@@ -258,7 +258,7 @@ void
 aputs (String s) {
    char ar[3][33];
    int offset = 0;
-   for (int i = 0;  i < s.length(); ++i) {
+   for (int i = 0;  i < s.length (); ++i) {
       if (s[i] >= 'A' && s[i] <= 'Z') {
          ar[0][i + offset] = 0;
          ar[1][i + offset] = 0;
@@ -273,35 +273,35 @@ aputs (String s) {
          s[i] += 'a' - '0';
          offset++;
       }
-      char x = acnv(s[i]);
+      char x = acnv (s[i]);
       ar[0][i + offset] = (x & 1)       | ((x & 8) / 4);
       ar[1][i + offset] = ((x & 2) / 2) | ((x & 16) / 8);
       ar[2][i + offset] = ((x & 4) / 4) | ((x & 32) / 16);
    }
    for (int line = 0; line < 3; ++line) {
-      for (int i = 0; i < s.length() + offset; ++i) {
+      for (int i = 0; i < s.length () + offset; ++i) {
          if (ar[line][i] & 2) {
             apush_magnet ();
             apull_magnet ();
          }
          for (int i = 0; i < 25; ++i)
-            amoveL();
+            amoveL ();
          if (ar[line][i] & 1) {
             apush_magnet ();
             apull_magnet ();
          }
          for (int i = 0; i < 35; ++i)
-            amoveL();
+            amoveL ();
       }
-      for (int i = 0; i < (s.length() + offset) * 60; ++i) {
-         amoveR();
+      for (int i = 0; i < (s.length () + offset) * 60; ++i) {
+         amoveR ();
       }
       for (int i = 0; i < 20; ++i) {
-         amoveD();
+         amoveD ();
       }
    }
    for (int i = 0; i < 20; ++i) {
-      amoveD();
+      amoveD ();
    }
 }
 

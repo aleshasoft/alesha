@@ -1,7 +1,6 @@
 #ifndef _ALESHALIB_H
 
 #define _ALESHALIB_H
-
 #include <ctype.h>
 #include <string.h>
 
@@ -16,14 +15,11 @@
 #define DELAY_BETWEEN_STEPS_Z 500
 #define DELAY_BETWEEN_STEPS_X 500
 
+#define LINE_WIDTH            33
+
 void alesha_init  (void);
-void apush_magnet (void);
-void apull_magnet (void);
-void amoveL       (void);
-void amoveR       (void);
+void amake_dot    (void);
 void astepZ       (void);
-void amoveU       (void);
-void amoveD       (void);
 void astepX       (void);
 char acnv         (int);
 void aputc        (char);
@@ -45,55 +41,43 @@ alesha_init (void) {
 }
 
 void
-apush_magnet (void) {
+amake_dot (void) {
    digitalWrite (MAGNET_PIN, HIGH);
    delay (DELAY_PUSH_PULL);
-}
-
-void
-apull_magnet (void) {
    digitalWrite (MAGNET_PIN, LOW);
    delay (DELAY_PUSH_PULL);
 }
 
 void
-amoveL (void) {
-   digitalWrite (Z_DIRECTION_PIN, LOW);
-   astepZ ();
+astep_h (int steps) {
+   if (steps < 0) {
+      steps = -steps;
+      digitalWrite (Z_DIRECTION_PIN, LOW);
+   } else {
+      digitalWrite (Z_DIRECTION_PIN, HIGH);
+   }
+   while (steps--) {
+      digitalWrite (Z_STEP_PIN, HIGH);
+      // delayMicroseconds (DELAY_BETWEEN_STEPS_Z);
+      digitalWrite (Z_STEP_PIN, LOW);
+      delayMicroseconds (DELAY_BETWEEN_STEPS_Z);
+   }
 }
 
 void
-amoveR (void) {
-   digitalWrite (Z_DIRECTION_PIN, HIGH);
-   astepZ ();
-}
-
-void
-astepZ (void) {
-   digitalWrite (Z_STEP_PIN, HIGH);
-   // delayMicroseconds (DELAY_BETWEEN_STEPS_Z);
-   digitalWrite (Z_STEP_PIN, LOW);
-   delayMicroseconds (DELAY_BETWEEN_STEPS_Z);
-}
-
-void
-amoveD (void) {
-   digitalWrite (X_DIRECTION_PIN, LOW);
-   astepX ();
-}
-
-void
-amoveU (void) {
-   digitalWrite (X_DIRECTION_PIN, HIGH);
-   astepX ();
-}
-
-void
-astepX (void) {
-   digitalWrite (X_STEP_PIN, HIGH);
-   // delayMicroseconds (DELAY_BETWEEN_STEPS_X);
-   digitalWrite (X_STEP_PIN, LOW);
-   delayMicroseconds (DELAY_BETWEEN_STEPS_X);
+astep_v (int steps) {
+   if (steps < 0) {
+      steps = -steps;
+      digitalWrite (X_DIRECTION_PIN, LOW);
+   } else {
+      digitalWrite (X_DIRECTION_PIN, HIGH);
+   }
+   while (steps--) {
+      digitalWrite (X_STEP_PIN, HIGH);
+      // delayMicroseconds (DELAY_BETWEEN_STEPS_X);
+      digitalWrite (X_STEP_PIN, LOW);
+      delayMicroseconds (DELAY_BETWEEN_STEPS_X);
+   }
 }
 
 bool odd = 1;
@@ -221,42 +205,8 @@ acnv (int c) {
 }
 
 void
-aputc (char c) {
-   c = acnv (c);
-   int now = 0;
-   while (now < 3) {
-      if (c & (1 << now)) {
-         apush_magnet ();
-         delay (100);
-         apull_magnet ();
-         delay (100);
-      }
-      now++;
-      for (int i = 0; i < 20; ++i)
-         amoveD ();
-   }
-   for (int i = 0; i < 60; ++i)
-      amoveU ();
-   for (int i = 0; i < 25; ++i)
-      amoveR ();
-   while (now < 6) {
-      if (c & (1 << now)) {
-         apush_magnet ();
-         apull_magnet ();
-      }
-      now++;
-      for (int i = 0; i < 20; ++i)
-         amoveD ();
-   }
-   for (int i = 0; i < 60; ++i)
-      amoveU ();
-   for (int i = 0; i < 25; ++i)
-      amoveR ();
-}
-
-void
 aputs (String s) {
-   char ar[3][33];
+   char ar[3][LINE_WIDTH];
    int offset = 0;
    for (int i = 0;  i < s.length (); ++i) {
       if (s[i] >= 'A' && s[i] <= 'Z') {
@@ -281,28 +231,18 @@ aputs (String s) {
    for (int line = 0; line < 3; ++line) {
       for (int i = 0; i < s.length () + offset; ++i) {
          if (ar[line][i] & 2) {
-            apush_magnet ();
-            apull_magnet ();
+            amake_dot ();
          }
-         for (int i = 0; i < 25; ++i)
-            amoveL ();
+         astep_h (25);
          if (ar[line][i] & 1) {
-            apush_magnet ();
-            apull_magnet ();
+            amake_dot ();
          }
-         for (int i = 0; i < 35; ++i)
-            amoveL ();
+         astep_h (35);
       }
-      for (int i = 0; i < (s.length () + offset) * 60; ++i) {
-         amoveR ();
-      }
-      for (int i = 0; i < 20; ++i) {
-         amoveD ();
-      }
+      astep_h ((s.length () + offset) * 60);
+      astep_v (-20);
    }
-   for (int i = 0; i < 20; ++i) {
-      amoveD ();
-   }
+   astep_v (-20);
 }
 
 #endif

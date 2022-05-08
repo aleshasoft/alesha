@@ -274,9 +274,9 @@ aputs (String s) {
          offset++;
       }
       char x = acnv (s[i]);
-      ar[0][i + offset] = (x & 1)       | ((x & 8) / 4);
-      ar[1][i + offset] = ((x & 2) / 2) | ((x & 16) / 8);
-      ar[2][i + offset] = ((x & 4) / 4) | ((x & 32) / 16);
+      ar[0][i + offset] = (x & 1)        | ((x >> 2) & 2);
+      ar[1][i + offset] = ((x >> 1) & 1) | ((x >> 3) & 2);
+      ar[2][i + offset] = ((x >> 2) & 1) | ((x >> 4) & 2);
    }
    for (int line = 0; line < 3; ++line) {
       for (int i = 0; i < s.length () + offset; ++i) {

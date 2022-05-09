@@ -233,11 +233,11 @@ aputs (String s) {
          if (ar[line][i] & 2) {
             amake_dot ();
          }
-         astep_h (25);
+         astep_h (-25);
          if (ar[line][i] & 1) {
             amake_dot ();
          }
-         astep_h (35);
+         astep_h (-35);
       }
       astep_h ((s.length () + offset) * 60);
       astep_v (-20);

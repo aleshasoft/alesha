@@ -11,9 +11,9 @@
 #define X_DIRECTION_PIN       5
 #define MAGIC                 8
 
-#define DELAY_PUSH_PULL       12
-#define DELAY_BETWEEN_STEPS_Z 500
-#define DELAY_BETWEEN_STEPS_X 500
+#define DELAY_PUSH_PULL       25
+#define DELAY_BETWEEN_STEPS_Z 1500
+#define DELAY_BETWEEN_STEPS_X 1500
 
 #define LINE_WIDTH            33
 
@@ -40,14 +40,17 @@ alesha_init (void) {
    digitalWrite (MAGIC, LOW);
 }
 
+// Print dot
 void
 amake_dot (void) {
+   delay (DELAY_PUSH_PULL);
    digitalWrite (MAGNET_PIN, HIGH);
    delay (DELAY_PUSH_PULL);
    digitalWrite (MAGNET_PIN, LOW);
    delay (DELAY_PUSH_PULL);
 }
 
+// Move head horizontally
 void
 astep_h (int steps) {
    if (steps < 0) {
@@ -58,12 +61,13 @@ astep_h (int steps) {
    }
    while (steps--) {
       digitalWrite (Z_STEP_PIN, HIGH);
-      // delayMicroseconds (DELAY_BETWEEN_STEPS_Z);
+      //delayMicroseconds (DELAY_BETWEEN_STEPS_Z);
       digitalWrite (Z_STEP_PIN, LOW);
       delayMicroseconds (DELAY_BETWEEN_STEPS_Z);
    }
 }
 
+// Move head vertically
 void
 astep_v (int steps) {
    if (steps < 0) {
@@ -74,7 +78,7 @@ astep_v (int steps) {
    }
    while (steps--) {
       digitalWrite (X_STEP_PIN, HIGH);
-      // delayMicroseconds (DELAY_BETWEEN_STEPS_X);
+      //delayMicroseconds (DELAY_BETWEEN_STEPS_X);
       digitalWrite (X_STEP_PIN, LOW);
       delayMicroseconds (DELAY_BETWEEN_STEPS_X);
    }
@@ -82,6 +86,7 @@ astep_v (int steps) {
 
 bool odd = 1;
 
+// Convert symbol
 char
 acnv (int c) {
    switch (c) {
@@ -201,9 +206,11 @@ acnv (int c) {
    case 'z':
       return 0b101110;
    }
+
    return 0b0;
 }
 
+// Put string
 void
 aputs (String s) {
    char ar[3][LINE_WIDTH];
@@ -216,7 +223,7 @@ aputs (String s) {
          s[i] += 'a' - 'A';
          offset++;
       }
-      if (s[i] >= '0' && s[i] <= 9) {
+      if (s[i] >= '0' && s[i] <= '9') {
          ar[0][i + offset] = 1;
          ar[1][i + offset] = 1;
          ar[2][i + offset] = 3;
